@@ -81,7 +81,7 @@ router.post('/:id/image', upload.single('image'), async (req, res) => {
         };
         var url = await fileUpload.getSignedUrl(options)
         const result = await productService.insertProductImage(req.params.id, url[0])
-        res.status(200).json({ data: result })
+        res.status(201).json({ data: result })
       } catch(error) {
         res.status(500).json({ error: error.message })
       }
