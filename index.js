@@ -20,7 +20,6 @@ app.use(cors())
 app.use('/product', require('./routes/product_route'))
 app.use('/category', require('./routes/category_route'))
 app.use('/pharmacy', require('./routes/pharmacy_route'))
-app.use('/optime', require('./routes/optime_route'))
 
 const PORT = process.env.PORT || 8001
 

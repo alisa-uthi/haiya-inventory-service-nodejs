@@ -2,7 +2,9 @@ const express = require('express')
 const router = express.Router()
 const upload = require('../config/multer')
 const bucket = require('../config/firebase')
+
 const pharmacyService = require('../services/pharmacy_service')
+const optimeService = require('../services/optime_service')
 
 // Get all pharmacies
 router.get('/', async (req, res) => {
@@ -19,6 +21,16 @@ router.get('/nearest', async (req, res) => {
     const { latitude, longitude } = req.body
     try {
         const result = await pharmacyService.getNearestPharmacies(latitude, longitude)
+        res.status(200).json({ data: result })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
+// Get operation time of the pharmacy
+router.get('/:pharId/optime', async (req, res) => {
+    try {
+        const result = await optimeService.getOptByPharmacyId(req.params.pharId)
         res.status(200).json({ data: result })
     } catch (error) {
         res.status(500).json({ error: error.message })
