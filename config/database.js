@@ -21,7 +21,7 @@ var connectionOptions = {
 
 const connection = mysql.createPool(connectionOptions);
 
-console.log("Inventory Service DB is connected!");
+console.log("Supplier Inventory Service DB is connected!");
  
 module.exports = connection
  
