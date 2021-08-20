@@ -29,17 +29,27 @@ export const getNearestPharmacies = async (latitude, longitude) => {
             let result = await axios.get(`http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`) 
             let address = result.data.data
 
-            let distance = findNearestPlace(latitude, longitude, address.Addr_Latitude, address.Addr_Longitude)
-            // If this location is within 10KM of the user, add it to the list
-            if(nearest > distance) {
-                // Get Operation Time of the pharmacy
-                let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
+            if(address) {
+                let distance = findNearestPlace(latitude, longitude, address.Addr_Latitude, address.Addr_Longitude)
+                // If this location is within 10KM of the user, add it to the list
+                if(nearest > distance) {
+                    // Get Operation Time of the pharmacy
+                    let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
+    
+                    // Get Rating of the pharmacy
+                    let rating = await axios.get(`http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`)
+                    rating = rating.data.data 
+    
+                    // Aggregate results
+                    pharmacy.Pcy_OperationTimes = operationTimes
+                    pharmacy.Distance = distance
+                    pharmacy.Pcy_Address = address
+                    if(rating) {
+                        pharmacy.Rating_Score = rating.Avg_Score
+                    }
 
-                // Aggregate results
-                pharmacy.Pcy_Address = address
-                pharmacy.Pcy_OperationTimes = operationTimes
-                pharmacy.Distance = distance
-                nearestPharmacies.push(pharmacy)
+                    nearestPharmacies.push(pharmacy)
+                }
             }
         }
 
