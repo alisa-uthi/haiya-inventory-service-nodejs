@@ -3,10 +3,12 @@ const connection = require('../config/database')
 export const getAllProducts = async () => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
-    query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, cg.Pcy_ID, cg.AvailQty, cg.Price, cg.ExpireDate '
+    query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
+    query += 'cg.Pcy_ID, pc.Pcy_Name, cg.AvailQty, cg.Price, cg.ExpireDate '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
+    query += 'INNER JOIN Pharmacy pc ON pc.ID = cg.Pcy_ID '   
     query += 'LEFT JOIN Product_Image pm ON pm.Pim_Prd_ID = p.ID;'
     
     try {
@@ -20,10 +22,12 @@ export const getAllProducts = async () => {
 export const getProductById = async (id) => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
-    query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, cg.Pcy_ID, cg.AvailQty, cg.Price, cg.ExpireDate '
+    query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
+    query += 'cg.Pcy_ID, pc.Pcy_Name, cg.AvailQty, cg.Price, cg.ExpireDate '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
+    query += 'INNER JOIN Pharmacy pc ON pc.ID = cg.Pcy_ID '
     query += 'LEFT JOIN Product_Image pm ON pm.Pim_Prd_ID = p.ID '
     query += 'WHERE p.ID = ? ;'
     
@@ -38,10 +42,12 @@ export const getProductById = async (id) => {
 export const getProductsByCatgoryId = async (catId) => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
-    query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, pm.Prd_Image, cg.Pcy_ID, cg.AvailQty, cg.Price, cg.ExpireDate '
+    query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
+    query += 'cg.Pcy_ID, pc.Pcy_Name, cg.AvailQty, cg.Price, cg.ExpireDate '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
+    query += 'INNER JOIN Pharmacy pc ON pc.ID = cg.Pcy_ID '
     query += 'LEFT JOIN Product_Image pm ON pm.Pim_Prd_ID = p.ID '
     query += 'WHERE c.ID = ? ;'
     
@@ -57,10 +63,11 @@ export const getProductsByPharmacyId = async (pharmacyId) => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
     query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
-    query += 'cg.Lot, cg.AvailQty, cg.Price, cg.ExpireDate '
+    query += 'cg.AvailQty, cg.Price, cg.ExpireDate, pc.Pcy_Name '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
+    query += 'INNER JOIN Pharmacy pc ON pc.ID = cg.Pcy_ID '
     query += 'LEFT JOIN Product_Image pm ON pm.Pim_Prd_ID = p.ID '
     query += 'WHERE cg.Pcy_ID = ? ;'
     
@@ -76,10 +83,11 @@ export const getProductsByCategoryAndPharmacy = async (catId, pharmacyId) => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
     query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
-    query += 'cg.Lot, cg.AvailQty, cg.Price, cg.ExpireDate '
+    query += 'cg.AvailQty, cg.Price, cg.ExpireDate, pc.Pcy_Name '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
+    query += 'INNER JOIN Pharmacy pc ON pc.ID = cg.Pcy_ID '
     query += 'LEFT JOIN Product_Image pm ON pm.Pim_Prd_ID = p.ID '
     query += 'WHERE c.ID = ? AND cg.Pcy_ID = ? ;'
     

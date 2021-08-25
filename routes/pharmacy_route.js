@@ -17,7 +17,7 @@ router.get('/', async (req, res) => {
 })
 
 // Get nearest pharmacies
-router.get('/nearest', async (req, res) => {
+router.post('/nearest', async (req, res) => {
     const { latitude, longitude } = req.body
     try {
         const result = await pharmacyService.getNearestPharmacies(latitude, longitude)
