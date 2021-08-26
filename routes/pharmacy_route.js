@@ -7,9 +7,10 @@ const pharmacyService = require('../services/pharmacy_service')
 const optimeService = require('../services/optime_service')
 
 // Get all pharmacies
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
+    const { latitude, longitude } = req.body
     try {
-        const result = await pharmacyService.getAllPharmacies()
+        const result = await pharmacyService.getAllPharmacies(latitude, longitude)
         res.status(200).json({ data: result })
     } catch (error) {
         res.status(500).json({ error: error.message })

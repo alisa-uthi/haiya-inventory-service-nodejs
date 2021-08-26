@@ -2,12 +2,44 @@ const connection = require('../config/database')
 const axios = require('axios')
 const optimeService = require('./optime_service')
 
-export const getAllPharmacies = async () => {
+export const getAllPharmacies = async (latitude, longitude) => {
+    let pharmaciesResult = []
     let query = 'SELECT * FROM Pharmacy;'
 
     try {
-        const pharmacies = await connection.promise().execute(query)
-        return pharmacies[0]
+        let pharmacies = await connection.promise().execute(query)
+        pharmacies = pharmacies[0]
+
+        // Find location 
+        for (const pharmacy of pharmacies) {
+            // Get Address of the pharmacy 
+            let result = await axios.get(`http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`) 
+            let address = result.data.data
+
+            if(address) {
+                // Find distance between user's location and pharmacy
+                let distance = findDistanceBetween(latitude, longitude, address.Addr_Latitude, address.Addr_Longitude)
+
+                // Get Operation Time of the pharmacy
+                let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
+
+                // Get Rating of the pharmacy
+                let rating = await axios.get(`http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`)
+                rating = rating.data.data 
+
+                // Aggregate results
+                pharmacy.Pcy_OperationTimes = operationTimes
+                pharmacy.Distance = distance
+                pharmacy.Pcy_Address = address
+                if(rating) {
+                    pharmacy.Rating_Score = rating.Avg_Score
+                }
+
+                pharmaciesResult.push(pharmacy)
+            }
+        }
+
+        return pharmaciesResult
     } catch (error) {
         throw new Error(`Get ALl Pharmacies: ${error.message}`)
     }
@@ -30,7 +62,8 @@ export const getNearestPharmacies = async (latitude, longitude) => {
             let address = result.data.data
 
             if(address) {
-                let distance = findNearestPlace(latitude, longitude, address.Addr_Latitude, address.Addr_Longitude)
+                // Find distance between user's location and pharmacy
+                let distance = findDistanceBetween(latitude, longitude, address.Addr_Latitude, address.Addr_Longitude)
                 // If this location is within 10KM of the user, add it to the list
                 if(nearest > distance) {
                     // Get Operation Time of the pharmacy
@@ -60,7 +93,7 @@ export const getNearestPharmacies = async (latitude, longitude) => {
     }
 }
 
-export const findNearestPlace = (lat1, lon1, lat2, lon2) => {
+export const findDistanceBetween = (lat1, lon1, lat2, lon2) => {
     var radlat1 = Math.PI * lat1/180
     var radlat2 = Math.PI * lat2/180
     var theta = lon1 - lon2
