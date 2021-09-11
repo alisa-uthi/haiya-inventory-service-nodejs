@@ -63,7 +63,7 @@ export const getProductsByPharmacyId = async (pharmacyId) => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
     query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
-    query += 'cg.AvailQty, cg.Price, cg.ExpireDate, pc.Pcy_Name '
+    query += 'cg.AvailQty, cg.Price, cg.ExpireDate, cg.Pcy_ID, pc.Pcy_Name '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
@@ -83,7 +83,7 @@ export const getProductsByCategoryAndPharmacy = async (catId, pharmacyId) => {
     let query 
     query = 'SELECT p.ID, p.Prd_TradeName, p.Prd_TradeCode, p.Prd_CompName, p.Prd_GenericName, '
     query += 'p.Prd_GenericAdvice, p.Prd_Prereq, p.Prd_Detail, p.Prd_PrdQtyUnit, c.Category, pm.Prd_Image, '
-    query += 'cg.AvailQty, cg.Price, cg.ExpireDate, pc.Pcy_Name '
+    query += 'cg.AvailQty, cg.Price, cg.ExpireDate, cg.Pcy_ID, pc.Pcy_Name '
     query += 'FROM Product p '
     query += 'INNER JOIN Category c ON c.ID = p.Prd_Category_ID '
     query += 'INNER JOIN Catalog cg ON cg.Prd_ID = p.ID '
