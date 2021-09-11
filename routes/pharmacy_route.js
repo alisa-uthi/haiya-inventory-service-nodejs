@@ -17,6 +17,16 @@ router.post('/', async (req, res) => {
     }
 })
 
+// Get pharmacy by id
+router.get('/:pharId', async (req, res) => {
+    try {
+        const result = await pharmacyService.getPharmacyById(req.params.pharId)
+        res.status(200).json({ data: result })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
 // Get nearest pharmacies
 router.post('/nearest', async (req, res) => {
     const { latitude, longitude } = req.body

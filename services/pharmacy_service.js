@@ -45,6 +45,37 @@ export const getAllPharmacies = async (latitude, longitude) => {
     }
 }
 
+export const getPharmacyById = async (pharId) => {
+    let query = 'SELECT * FROM Pharmacy WHERE ID = ? ;'
+
+    try {
+        let result = await connection.promise().execute(query, [ pharId ])
+        let pharmacy = result[0][0]
+
+        // Get Address of the pharmacy 
+        let addrResult = await axios.get(`http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`) 
+        let address = addrResult.data.data
+
+        // Get Operation Time of the pharmacy
+        let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
+
+        // Get Rating of the pharmacy
+        let rating = await axios.get(`http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`)
+        rating = rating.data.data 
+
+        // Aggregate results
+        pharmacy.Pcy_OperationTimes = operationTimes
+        pharmacy.Pcy_Address = address
+        if(rating) {
+            pharmacy.Rating_Score = rating.Avg_Score
+        }
+
+        return pharmacy
+    } catch (error) {
+        throw new Error(`Get Pharmacy By ID: ${error.message}`)
+    }
+}
+
 export const getNearestPharmacies = async (latitude, longitude) => {
     let nearest = 10   // 10 KM
     let nearestPharmacies = []
