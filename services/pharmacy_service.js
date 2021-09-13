@@ -76,6 +76,17 @@ export const getPharmacyById = async (pharId) => {
     }
 }
 
+export const getPharmacyByName = async (pharName) => {
+    let query = 'SELECT * FROM inventory.Pharmacy WHERE Pcy_Name = ? ;'
+
+    try {
+        let result = await connection.promise().execute(query, [ pharName ])
+        return result[0][0]
+    } catch (error) {
+        throw new Error(`Get Pharmacy By Name: ${error.message}`)
+    }
+}
+
 export const getNearestPharmacies = async (latitude, longitude) => {
     let nearest = 10   // 10 KM
     let nearestPharmacies = []

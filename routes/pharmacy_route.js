@@ -17,6 +17,16 @@ router.post('/', async (req, res) => {
     }
 })
 
+// Get pharmacy by name
+router.get('/', async (req, res) => {
+    try {
+        const result = await pharmacyService.getPharmacyByName(req.query.name)
+        res.status(200).json({ data: result })
+    } catch (error) {
+        res.status(500).json({ error: error.message })
+    }
+})
+
 // Get pharmacy by id
 router.get('/:pharId', async (req, res) => {
     try {
