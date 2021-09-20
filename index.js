@@ -1,6 +1,8 @@
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+const passport = require('passport')
+require('./config/passport')
 const connection = require('./config/database')
 const app = express()
 
@@ -17,9 +19,9 @@ app.use(express.json())
 app.use(cors())
 
 // Routes
-app.use('/product', require('./routes/product_route'))
-app.use('/category', require('./routes/category_route'))
-app.use('/pharmacy', require('./routes/pharmacy_route'))
+app.use('/product', passport.authenticate('jwt', {session: false}), require('./routes/product_route'))
+app.use('/category', passport.authenticate('jwt', {session: false}), require('./routes/category_route'))
+app.use('/pharmacy', passport.authenticate('jwt', {session: false}), require('./routes/pharmacy_route'))
 
 const PORT = process.env.PORT || 8001
 

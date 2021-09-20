@@ -2,7 +2,7 @@ const connection = require('../config/database')
 const axios = require('axios')
 const optimeService = require('./optime_service')
 
-export const getAllPharmacies = async (latitude, longitude) => {
+export const getAllPharmacies = async (latitude, longitude, authorizationToken) => {
     let pharmaciesResult = []
     let query = 'SELECT * FROM Pharmacy;'
 
@@ -13,7 +13,14 @@ export const getAllPharmacies = async (latitude, longitude) => {
         // Find location 
         for (const pharmacy of pharmacies) {
             // Get Address of the pharmacy 
-            let result = await axios.get(`http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`) 
+            let result = await axios.get(
+                `http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`,
+                {
+                    headers: {
+                        Authorization: authorizationToken,
+                    }
+                }
+            ) 
             let address = result.data.data
 
             if(address) {
@@ -24,7 +31,14 @@ export const getAllPharmacies = async (latitude, longitude) => {
                 let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
 
                 // Get Rating of the pharmacy
-                let rating = await axios.get(`http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`)
+                let rating = await axios.get(
+                    `http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`,
+                    {
+                        headers: {
+                            Authorization: authorizationToken,
+                        }
+                    }   
+                )
                 rating = rating.data.data 
 
                 // Aggregate results
@@ -45,7 +59,7 @@ export const getAllPharmacies = async (latitude, longitude) => {
     }
 }
 
-export const getPharmacyById = async (pharId) => {
+export const getPharmacyById = async (pharId, authorizationToken) => {
     let query = 'SELECT * FROM Pharmacy WHERE ID = ? ;'
 
     try {
@@ -53,14 +67,28 @@ export const getPharmacyById = async (pharId) => {
         let pharmacy = result[0][0]
 
         // Get Address of the pharmacy 
-        let addrResult = await axios.get(`http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`) 
+        let addrResult = await axios.get(
+            `http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`,
+            {
+                headers: {
+                    Authorization: authorizationToken,
+                }
+            }
+        ) 
         let address = addrResult.data.data
 
         // Get Operation Time of the pharmacy
         let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
 
         // Get Rating of the pharmacy
-        let rating = await axios.get(`http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`)
+        let rating = await axios.get(
+            `http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`,
+            {
+                headers: {
+                    Authorization: authorizationToken,
+                }
+            }
+        )
         rating = rating.data.data 
 
         // Aggregate results
@@ -87,7 +115,7 @@ export const getPharmacyByName = async (pharName) => {
     }
 }
 
-export const getNearestPharmacies = async (latitude, longitude) => {
+export const getNearestPharmacies = async (latitude, longitude, authorizationToken) => {
     let nearest = 10   // 10 KM
     let nearestPharmacies = []
     let query = 'SELECT * FROM Pharmacy;'
@@ -100,7 +128,14 @@ export const getNearestPharmacies = async (latitude, longitude) => {
         // Find location within 1 KM
         for (const pharmacy of pharmacies) {
             // Get Address of the pharmacy 
-            let result = await axios.get(`http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`) 
+            let result = await axios.get(
+                `http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`,
+                {
+                    headers: {
+                        Authorization: authorizationToken,
+                    }
+                }
+            ) 
             let address = result.data.data
 
             if(address) {
@@ -112,7 +147,14 @@ export const getNearestPharmacies = async (latitude, longitude) => {
                     let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
     
                     // Get Rating of the pharmacy
-                    let rating = await axios.get(`http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`)
+                    let rating = await axios.get(
+                        `http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`,
+                        {
+                            headers: {
+                                Authorization: authorizationToken,
+                            }
+                        }
+                    )
                     rating = rating.data.data 
     
                     // Aggregate results

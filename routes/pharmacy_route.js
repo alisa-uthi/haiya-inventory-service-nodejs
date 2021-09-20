@@ -9,8 +9,9 @@ const optimeService = require('../services/optime_service')
 // Get all pharmacies
 router.post('/', async (req, res) => {
     const { latitude, longitude } = req.body
+    const authorizationToken = req.headers.authorization
     try {
-        const result = await pharmacyService.getAllPharmacies(latitude, longitude)
+        const result = await pharmacyService.getAllPharmacies(latitude, longitude, authorizationToken)
         res.status(200).json({ data: result })
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -29,8 +30,9 @@ router.get('/', async (req, res) => {
 
 // Get pharmacy by id
 router.get('/:pharId', async (req, res) => {
+    const authorizationToken = req.headers.authorization
     try {
-        const result = await pharmacyService.getPharmacyById(req.params.pharId)
+        const result = await pharmacyService.getPharmacyById(req.params.pharId, authorizationToken)
         res.status(200).json({ data: result })
     } catch (error) {
         res.status(500).json({ error: error.message })
@@ -40,8 +42,9 @@ router.get('/:pharId', async (req, res) => {
 // Get nearest pharmacies
 router.post('/nearest', async (req, res) => {
     const { latitude, longitude } = req.body
+    const authorizationToken = req.headers.authorization
     try {
-        const result = await pharmacyService.getNearestPharmacies(latitude, longitude)
+        const result = await pharmacyService.getNearestPharmacies(latitude, longitude, authorizationToken)
         res.status(200).json({ data: result })
     } catch (error) {
         res.status(500).json({ error: error.message })
