@@ -10,9 +10,9 @@ export const getAllPharmacies = async (latitude, longitude, authorizationToken) 
         let pharmacies = await connection.promise().execute(query)
         pharmacies = pharmacies[0]
 
-        // Find location 
+        // Find location
         for (const pharmacy of pharmacies) {
-            // Get Address of the pharmacy 
+            // Get Address of the pharmacy
             let result = await axios.get(
                 `http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`,
                 {
@@ -20,7 +20,7 @@ export const getAllPharmacies = async (latitude, longitude, authorizationToken) 
                         Authorization: authorizationToken,
                     }
                 }
-            ) 
+            )
             let address = result.data.data
 
             if(address) {
@@ -37,9 +37,9 @@ export const getAllPharmacies = async (latitude, longitude, authorizationToken) 
                         headers: {
                             Authorization: authorizationToken,
                         }
-                    }   
+                    }
                 )
-                rating = rating.data.data 
+                rating = rating.data.data
 
                 // Aggregate results
                 pharmacy.Pcy_OperationTimes = operationTimes
@@ -66,7 +66,7 @@ export const getPharmacyById = async (pharId, authorizationToken) => {
         let result = await connection.promise().execute(query, [ pharId ])
         let pharmacy = result[0][0]
 
-        // Get Address of the pharmacy 
+        // Get Address of the pharmacy
         let addrResult = await axios.get(
             `http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`,
             {
@@ -74,7 +74,7 @@ export const getPharmacyById = async (pharId, authorizationToken) => {
                     Authorization: authorizationToken,
                 }
             }
-        ) 
+        )
         let address = addrResult.data.data
 
         // Get Operation Time of the pharmacy
@@ -89,7 +89,7 @@ export const getPharmacyById = async (pharId, authorizationToken) => {
                 }
             }
         )
-        rating = rating.data.data 
+        rating = rating.data.data
 
         // Aggregate results
         pharmacy.Pcy_OperationTimes = operationTimes
@@ -119,7 +119,7 @@ export const getNearestPharmacies = async (latitude, longitude, authorizationTok
     let nearest = 10   // 10 KM
     let nearestPharmacies = []
     let query = 'SELECT * FROM Pharmacy;'
-    
+
     try {
         // Get all pharmacies
         let pharmacies = await connection.promise().execute(query)
@@ -127,7 +127,7 @@ export const getNearestPharmacies = async (latitude, longitude, authorizationTok
 
         // Find location within 1 KM
         for (const pharmacy of pharmacies) {
-            // Get Address of the pharmacy 
+            // Get Address of the pharmacy
             let result = await axios.get(
                 `http://user-profile-service:8000/address/${pharmacy.Pcy_Addr_ID}`,
                 {
@@ -135,7 +135,7 @@ export const getNearestPharmacies = async (latitude, longitude, authorizationTok
                         Authorization: authorizationToken,
                     }
                 }
-            ) 
+            )
             let address = result.data.data
 
             if(address) {
@@ -145,7 +145,7 @@ export const getNearestPharmacies = async (latitude, longitude, authorizationTok
                 if(nearest > distance) {
                     // Get Operation Time of the pharmacy
                     let operationTimes = await optimeService.getOptByPharmacyId(pharmacy.ID)
-    
+
                     // Get Rating of the pharmacy
                     let rating = await axios.get(
                         `http://rating-review-service:8004/pharmacy/${pharmacy.ID}/average`,
@@ -155,8 +155,8 @@ export const getNearestPharmacies = async (latitude, longitude, authorizationTok
                             }
                         }
                     )
-                    rating = rating.data.data 
-    
+                    rating = rating.data.data
+
                     // Aggregate results
                     pharmacy.Pcy_OperationTimes = operationTimes
                     pharmacy.Distance = distance
@@ -177,27 +177,31 @@ export const getNearestPharmacies = async (latitude, longitude, authorizationTok
     }
 }
 
-export const findDistanceBetween = (lat1, lon1, lat2, lon2) => {
-    var radlat1 = Math.PI * lat1/180
-    var radlat2 = Math.PI * lat2/180
-    var theta = lon1 - lon2
-    var radtheta = Math.PI * theta / 180
-    
-    var dist = Math.sin(radlat1) * Math.sin(radlat2) + Math.cos(radlat1) * Math.cos(radlat2) * Math.cos(radtheta);
-    dist = Math.acos(dist)
-    dist = dist * 180/Math.PI
-    dist = dist * 60 * 1.1515
-    dist = dist * 1.609344 
-
-    return parseFloat(dist.toFixed(2))
-} 
-
 export const updatePharmacyImage = async (pharId, imagePath) => {
     let query = 'UPDATE Pharmacy SET Pcy_Image = ? WHERE ID = ? ;'
-    
+
     try {
         await connection.promise().execute(query, [imagePath, pharId]);
     } catch (err) {
         throw new Error(`Update Pharmacy Image By Pharmacy ID: ${err.message}`)
     }
 }
+
+export const findDistanceBetween = (lat1, lon1, lat2, lon2) => {
+    var RADIUS = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);
+    var dLon = deg2rad(lon2-lon1);
+    var a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var distance = RADIUS * c; // Distance in km
+
+    return parseFloat(distance.toFixed(2))
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI/180)
+}
+
