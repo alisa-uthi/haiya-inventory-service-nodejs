@@ -62,10 +62,10 @@ router.post("/nearest", async (req, res) => {
   const authorizationToken = req.headers.authorization;
   try {
     //   Get data from cache
-    const cacheResult = cache.get("nearestPharmacies");
-    if (cacheResult != undefined) {
-      return res.status(200).json({ data: cacheResult, cache: true });
-    }
+    // const cacheResult = cache.get("nearestPharmacies");
+    // if (cacheResult != undefined) {
+    //   return res.status(200).json({ data: cacheResult, cache: true });
+    // }
 
     const result = await pharmacyService.getNearestPharmacies(
       latitude,
