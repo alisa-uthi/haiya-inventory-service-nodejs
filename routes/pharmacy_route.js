@@ -34,8 +34,23 @@ router.post("/", async (req, res) => {
 
 // Get pharmacy by name
 router.get("/", async (req, res) => {
+  const authorizationToken = req.headers.authorization;
+
   try {
-    const result = await pharmacyService.getPharmacyByName(req.query.name);
+    let result = {};
+    if (req.query.latitude && req.query.longitude) {
+      result = await pharmacyService.getPharmacyByNameAndDistance(
+        req.query.latitude,
+        req.query.longitude,
+        req.query.name,
+        authorizationToken
+      );
+    } else {
+      result = await pharmacyService.getPharmacyByName(
+        req.query.name,
+        authorizationToken
+      );
+    }
     res.status(200).json({ data: result });
   } catch (error) {
     res.status(500).json({ error: error.message });
